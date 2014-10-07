@@ -113,5 +113,5 @@ for (( i=0; $i<${#userathost[@]} ; ++i )) do
   fi
 done
 
-trap "killtree -9 $BASHPID" EXIT SIGINT SIGTERM
+trap "killtree -9 $BASHPID yes" EXIT SIGINT SIGTERM
 wait
