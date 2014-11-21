@@ -73,13 +73,13 @@ usage() {
 
 [ "$1" = "-h" -o "$1" = "--help" ] && usage 0
 if [ $# -eq 0 ] ; then
-  [ -t 0 -a -z "$SCRIPT" ] && usage 1
+  [ -t 0 -a -z "$SSHALL_SCRIPT" ] && usage 1
   cat 
 fi
 
 if [ ! -t 0 ] ; then
-  SCRIPT=/tmp/stdin.$$.tmp
-  cat > $SCRIPT
+  SSHALL_SCRIPT=/tmp/stdin.$$.tmp
+  cat > $SSHALL_SCRIPT
 fi
 
 userathost=($HOSTS)
@@ -105,13 +105,14 @@ sshlog() {
   return $STATUS
 }
 
+trap "killtree -9 $BASHPID" SIGINT SIGTERM
+
 for (( i=0; $i<${#userathost[@]} ; ++i )) do
-  if [ -n "$SCRIPT" ] ; then
-    ( sshlog ${userathost[$i]} $@ < "$SCRIPT" ; echo $THIS: ${userathost[$i]} status $? ) &
+  if [ -n "$SSHALL_SCRIPT" ] ; then
+    ( sshlog ${userathost[$i]} $@ < "$SSHALL_SCRIPT" ; echo $THIS: ${userathost[$i]} status $? ) &
   else
     ( sshlog ${userathost[$i]} $@ ; echo $THIS: ${userathost[$i]} status $? ) &
   fi
 done
 
-trap "killtree -9 $BASHPID yes" EXIT SIGINT SIGTERM
 wait
